@@ -1,0 +1,24 @@
+name: kexa check
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+    workflow_dispatch:
+    repository_dispatch:
+      types:
+        - webhook
+jobs:
+    Kexa-ci:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+            
+        - name: Kexa-Action
+          uses: 4urcloud/Kexa_githubAction@1.0.15
+          with:
+            MYOWNRULES: ./rules
+            #add your own variables here
