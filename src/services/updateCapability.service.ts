@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-function updateVersion(){
+export function updateVersion(){
     let packageJson = require("../../package.json");
     let version = fs.readFileSync("./VERSION", "utf8");
     packageJson.version = version.split("\n")[0];

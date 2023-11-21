@@ -32,6 +32,7 @@
     "tslog": "^4.7.1"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.5",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
     "nodemon": "^3.0.1",
