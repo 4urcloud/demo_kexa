@@ -1,0 +1,42 @@
+{
+  "name": "template-kexa-action",
+  "version": "1.0.0",
+  "description": "Fresh template for a new TS repo",
+  "main": "./src/app.ts",
+  "scripts": {
+    "build": "rimraf ./build && tsc",
+    "test": "npm run build && mocha --require ts-node/register --require source-map-support/register 'src/__tests__/**/*.test.ts'",
+    "start:dev": "npx nodemon",
+    "start": "npm run build && node build/index.js",
+    "start:o": "npm run build && node build/index.js -o",
+    "start:nobuild": "node build/index.js",
+    "update": "npm run build && node build/services/updateCapability.service.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/4urcloud/demo_kexa.git"
+  },
+  "keywords": [
+    "Kexa",
+    "typescript"
+  ],
+  "author": "4urcloud | Esteban MATHIA",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/4urcloud/demo_kexa/issues"
+  },
+  "homepage": "https://github.com/4urcloud/demo_kexa#readme",
+  "dependencies": {
+    "config": "^3.3.9",
+    "dotenv": "^16.3.1",
+    "tslog": "^4.7.1"
+  },
+  "devDependencies": {
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "nodemon": "^3.0.1",
+    "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  }
+}

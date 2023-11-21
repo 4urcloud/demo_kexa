@@ -1,24 +1,117 @@
-name: kexa check
+name: All CI
 on:
-    push:
-        branches:
-            - main
-    pull_request:
-        branches:
-            - main
-    workflow_dispatch:
-    repository_dispatch:
-      types:
-        - webhook
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to execute the workflow'
+        required: true
+        default: 'main'
+  repository_dispatch:
+    types:
+      - webhook
 jobs:
-    Kexa-ci:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
-            
-        - name: Kexa-Action
-          uses: 4urcloud/Kexa_githubAction@1.0.15
-          with:
-            MYOWNRULES: ./rules
-            #add your own variables here
+  Kexa-ci:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+        
+    - name: Kexa-Action
+      uses: 4urcloud/Kexa_githubAction@1.0.15
+      with:
+        MYOWNRULES: ./rules
+        #add your own variables here
+    
+  classic-ci:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}   # checkout the correct branch name
+          fetch-depth: 0     
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+
+      - name: Installing dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Git Version
+        id: versioning
+        uses: codacy/git-version@2.8.0
+        with:
+          release-branch: main
+          dev-branch: dev
+          log-paths: Kexa/
+          minor-identifier: 'feat:'
+          major-identifier: 'break:'
+
+      - name: Set up version in file
+        run: echo "${{ steps.versioning.outputs.version }}" > VERSION
+
+      - name: Run extract Addon
+        run: npm run update
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v39
+
+      - name: List all changed files
+        run: |
+          echo "## ${{ steps.versioning.outputs.version }}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### Files added: ${{steps.changed-files.outputs.added_files_count}}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          for file in ${{ steps.changed-files.outputs.added_files }}; do 
+            echo "$file was added" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          done
+          echo "### Files changed: ${{steps.changed-files.outputs.all_changed_and_modified_files_count}}" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}; do 
+            echo "$file was changed" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          done
+          echo "" >> CHANGELOG.md
+
+      - name: commit changes
+        uses: EndBug/add-and-commit@v4
+        with:
+          message: "Automated commit by GitHub Actions"
+
+      #comment this part if you don't want to push on private docker registry
+      - name: Login to Docker Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY_NAME}}
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Push on Docker Registry
+        uses: docker/build-push-action@v4
+        with:
+          context: ./
+          push: true
+          #change the name of the repo
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_NAME}}/innovtech/myrepo:${{ steps.versioning.outputs.version }}
+            ${{ secrets.DOCKER_REGISTRY_NAME}}/innovtech/myrepo:latest
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "${{ steps.versioning.outputs.version }}"
