@@ -1,0 +1,1 @@
+configure your default.json according to the [documentation](https://github.com/4urcloud/Kexa/blob/main/documentation/Documentation-Kexa.md#basic-configuration)

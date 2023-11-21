@@ -1,1 +1,1 @@
-add all your set of rules in this folder
+add all your set of [rules](https://github.com/4urcloud/Kexa/tree/main/Kexa/rules) in this folder
