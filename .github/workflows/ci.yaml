@@ -106,7 +106,7 @@ jobs:
           #change the name of the repo
           tags: |
             ${{ secrets.DOCKER_REGISTRY_NAME}}/innovtech/myrepo:${{ steps.versioning.outputs.version }}
-            ${{ secrets.DOCKER_REGISTRY_NAME}}/innovtech/myrepo:latest
+            ${{ if eq(github.ref, 'refs/heads/main') }}${{ secrets.DOCKER_REGISTRY_NAME}}/innovtech/myrepo:latest{{ else }}{{ endif }}
 
       - name: Release
         uses: ncipollo/release-action@v1
