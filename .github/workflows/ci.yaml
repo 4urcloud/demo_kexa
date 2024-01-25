@@ -18,7 +18,7 @@ jobs:
           uses: actions/checkout@v4
             
         - name: Kexa-Action
-          uses: 4urcloud/Kexa_githubAction@1.0.15
+          uses: 4urcloud/Kexa_githubAction@1.0.18
           with:
             MYOWNRULES: ./rules
             #add your own variables here
